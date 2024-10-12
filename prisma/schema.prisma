@@ -12,3 +12,33 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  id        String      @id @default(uuid())
+  email     String      @unique
+  username  String
+  password  String
+  name      String
+  status    Status      @default(ACTIVE)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime?   @updatedAt
+  deletedAt DateTime?
+  ShortUrls ShortUrls[]
+}
+
+model ShortUrls {
+  id        String    @id @default(uuid())
+  longUrl   String
+  shortUrl  String    @unique
+  click     Int       @default(0)
+  status    Status    @default(ACTIVE)
+  userId    String?
+  updatedAt DateTime? @updatedAt
+  deletedAt DateTime?
+  user      User?     @relation(fields: [userId], references: [id])
+}
+
+enum Status {
+  ACTIVE
+  DELETED
+}
