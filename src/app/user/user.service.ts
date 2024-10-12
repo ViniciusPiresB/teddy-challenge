@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { hashSync } from 'bcrypt';
 import { PrismaService } from 'src/database/prisma.service';
@@ -27,8 +23,7 @@ export class UserService {
 
     if (!user) throw new NotFoundException('User not found.');
 
-    if (user.status == Status.DELETED)
-      throw new BadRequestException('User deleted.');
+    if (user.status == Status.DELETED) throw new BadRequestException('User deleted.');
 
     return user;
   }
