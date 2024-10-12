@@ -19,7 +19,9 @@ export class ShortenerService {
       },
     });
 
-    return createdShortUrl;
+    const shortenedUrl = `${process.env.BASE_URL}/${createdShortUrl.shortUrl}`;
+
+    return { shortenedUrl };
   }
 
   async listUrlsOfUser(user: JwtPayload) {
