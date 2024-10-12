@@ -1,18 +1,20 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { nanoid } from 'nanoid';
 import { PrismaService } from 'src/database/prisma.service';
+import { JwtPayload } from '../auth/dto/jwt-payload.dto';
 
 @Injectable()
 export class ShortenerService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async createShortUrl(longUrl: string) {
+  async createShortUrl(longUrl: string, user: JwtPayload) {
     const shortUrl = nanoid(6);
 
     const createdShortUrl = await this.prismaService.shortUrls.create({
       data: {
         longUrl,
         shortUrl,
+        userId: user ? user.id : undefined,
       },
     });
 

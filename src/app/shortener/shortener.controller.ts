@@ -1,14 +1,16 @@
 import { Body, Controller, Get, Param, Post, Res } from '@nestjs/common';
 import { ShortenerService } from './shortener.service';
 import { CreateShortDto } from './dto/create-short.dto';
+import { GetUser } from '../decorator/get-user.decorator';
+import { JwtPayload } from '../auth/dto/jwt-payload.dto';
 
 @Controller()
 export class ShortenerController {
   constructor(private readonly shortenerService: ShortenerService) {}
 
   @Post()
-  create(@Body() createShortDto: CreateShortDto) {
-    return this.shortenerService.createShortUrl(createShortDto.url);
+  create(@Body() createShortDto: CreateShortDto, @GetUser() user: JwtPayload) {
+    return this.shortenerService.createShortUrl(createShortDto.url, user);
   }
 
   @Get(':shortUrl')
