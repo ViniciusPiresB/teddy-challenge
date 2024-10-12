@@ -34,11 +34,19 @@ export class UserService {
     return user;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
-  }
+  async delete(email: string) {
+    const user = await this.findByEmail(email);
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+    const date = new Date().toISOString();
+
+    const deletedUser = await this.prismaService.user.update({
+      where: user,
+      data: {
+        status: Status.DELETED,
+        deletedAt: date,
+      },
+    });
+
+    return deletedUser;
   }
 }
