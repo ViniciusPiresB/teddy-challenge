@@ -38,11 +38,7 @@ export class ShortenerService {
   async updateLongUrl(user: JwtPayload, shortUrl: string, longUrl: string) {
     if (!user) throw new BadRequestException('User not provided.');
 
-    const url = await this.prismaService.shortUrls.findUnique({
-      where: { shortUrl },
-    });
-
-    if (!url) throw new NotFoundException('ShortUrl Not Found.');
+    const url = await this.getUrl(shortUrl);
 
     const urlUserId = url.userId;
 
@@ -57,14 +53,10 @@ export class ShortenerService {
   }
 
   async findLongUrl(shortUrl: string) {
-    const record = await this.prismaService.shortUrls.findUnique({
-      where: { shortUrl },
-    });
-
-    if (!record) throw new NotFoundException('Url not found');
+    const url = await this.getUrl(shortUrl);
 
     await this.prismaService.shortUrls.update({
-      where: record,
+      where: url,
       data: {
         click: {
           increment: 1,
@@ -72,6 +64,16 @@ export class ShortenerService {
       },
     });
 
-    return record;
+    return url;
+  }
+
+  private async getUrl(shortUrl: string) {
+    const url = await this.prismaService.shortUrls.findUnique({
+      where: { shortUrl },
+    });
+
+    if (!url) throw new NotFoundException('ShortUrl Not Found.');
+
+    return url;
   }
 }
