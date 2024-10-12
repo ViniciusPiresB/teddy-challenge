@@ -2,6 +2,7 @@ import { BadRequestException, Injectable, NotFoundException, UnauthorizedExcepti
 import { nanoid } from 'nanoid';
 import { PrismaService } from 'src/database/prisma.service';
 import { JwtPayload } from '../auth/dto/jwt-payload.dto';
+import { Status } from '@prisma/client';
 
 @Injectable()
 export class ShortenerService {
@@ -27,6 +28,7 @@ export class ShortenerService {
     const urls = await this.prismaService.shortUrls.findMany({
       where: {
         userId: user.id,
+        status: Status.ACTIVE,
       },
     });
 
