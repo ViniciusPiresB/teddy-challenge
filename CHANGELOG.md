@@ -1,9 +1,15 @@
 # Changelog
 
-Todas as mudanças notáveis deste projeto estarão documentadas neste arquivo.
+All notable changes to this project will be documented in this file.
 
-## [0.1.0] - 2024-09-01
+## [0.1.0] - 2024-10-12
 
-### Adicionado
+### Added
 
-- Criação do encurtador de URLs funcionando sem autenticação.
+- Created URL shortener working without authentication.
+
+## [0.2.0] - 2024-10-12
+
+### Added
+
+- Added authentication to user routes.

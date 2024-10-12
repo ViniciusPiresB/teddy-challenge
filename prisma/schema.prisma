@@ -19,6 +19,7 @@ model User {
   username  String
   password  String
   name      String
+  typeUser  Int         @default(0)
   status    Status      @default(ACTIVE)
   createdAt DateTime    @default(now())
   updatedAt DateTime?   @updatedAt
