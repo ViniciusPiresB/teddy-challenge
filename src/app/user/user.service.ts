@@ -1,8 +1,13 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { hashSync } from 'bcrypt';
 import { PrismaService } from 'src/database/prisma.service';
+import { Status } from '@prisma/client';
 
 @Injectable()
 export class UserService {
@@ -18,12 +23,15 @@ export class UserService {
     return user;
   }
 
-  findAll() {
-    return `This action returns all user`;
-  }
+  async findByEmail(email: string) {
+    const user = await this.prismaService.user.findUnique({ where: { email } });
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+    if (!user) throw new NotFoundException('User not found.');
+
+    if (user.status == Status.DELETED)
+      throw new BadRequestException('User deleted.');
+
+    return user;
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {
