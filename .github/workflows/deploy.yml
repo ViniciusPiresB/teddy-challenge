@@ -38,14 +38,16 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
         run: |
+          echo "Start run..."
           echo "${{ secrets.EC2_SSH_KEY }}" > key.pem
+          echo "Key copied"
           chmod 600 key.pem
+          echo "Key permission changed"
           scp -i key.pem -o StrictHostKeyChecking=no -r ./* ${EC2_USER}@${EC2_HOST}:/home/${EC2_USER}/teddychallenge/
+          echo "scp"
           ssh -i key.pem -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST} "
             set -e;
-            echo 'export DATABASE_URL=${DATABASE_URL}' >> ~/.bashrc &&
-            echo 'export JWT_SECRET=${JWT_SECRET}' >> ~/.bashrc &&
-            source ~/.bashrc && 
             cd /home/${EC2_USER}/teddychallenge && 
             npm install && 
             pm2 start dist/main.js --name 'teddy-app' || pm2 restart 'teddy-app'"
+          echo "finish"
