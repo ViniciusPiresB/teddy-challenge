@@ -80,4 +80,17 @@ describe('ShortenerController', () => {
   it('Should be defined', () => {
     expect(shortenerController).toBeDefined();
   });
+
+  describe('create', () => {
+    it('Should create a short URL', async () => {
+      const createShortDto: CreateShortDto = { url: 'http://example.com' };
+
+      const result = await shortenerController.create(createShortDto, fakeUser);
+
+      expect(result).toEqual({ ...fakeShortUrlsFromUser[0], longUrl: createShortDto.url });
+      expect(shortenerServiceMock.createShortUrl).toHaveBeenCalledWith(createShortDto.url, fakeUser);
+      expect(shortenerServiceMock.createShortUrl).toHaveBeenCalledTimes(1);
+    });
+  });
+
 });
