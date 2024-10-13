@@ -1,0 +1,73 @@
+import { PrismaService } from '../../database/prisma.service';
+import { UserService } from './user.service';
+import { Status, User } from '@prisma/client';
+import { Test, TestingModule } from '@nestjs/testing';
+
+describe('UserService', () => {
+  let userService: UserService;
+  let prismaService: PrismaService;
+
+  const fakeUsers: User[] = [
+    {
+      name: 'Test User 1',
+      password: 'pass123',
+      id: 'a3718843-5456-4482-9c97-a20f78cbd44e',
+      email: 'test@user.com',
+      username: 'testuser1',
+      typeUser: 1,
+      status: Status.ACTIVE,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      deletedAt: null,
+    },
+    {
+      name: 'Test User 2',
+      password: 'pass123',
+      id: 'a37546843-5436-4482-4c97-a20f78cdwgd3',
+      email: 'test@user.com',
+      username: 'testuser2',
+      typeUser: 1,
+      status: Status.ACTIVE,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      deletedAt: null,
+    },
+  ];
+
+  const updatedFakeUser: User = {
+    ...fakeUsers[0],
+    name: 'Updated Test User 1',
+    password: 'updatedpass123',
+    email: 'updatedemail@user.com',
+    username: 'updatedtestuser1',
+    updatedAt: new Date(),
+  };
+
+  const prismaMock = {
+    user: {
+      create: jest.fn().mockReturnValue(fakeUsers[0]),
+      findUnique: jest.fn().mockResolvedValue(fakeUsers[0]),
+      update: jest.fn().mockReturnValue(updatedFakeUser),
+    },
+  };
+
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [UserService, { provide: PrismaService, useValue: prismaMock }],
+    }).compile();
+
+    userService = module.get<UserService>(UserService);
+    prismaService = module.get<PrismaService>(PrismaService);
+  });
+
+  afterEach(() => {
+    prismaMock.user.create.mockClear();
+    prismaMock.user.findUnique.mockClear();
+    prismaMock.user.update.mockClear();
+  });
+
+  it('Should be defined', () => {
+    expect(userService).toBeDefined();
+    expect(prismaService).toBeDefined();
+  });
+});
