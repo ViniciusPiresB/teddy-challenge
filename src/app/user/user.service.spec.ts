@@ -3,6 +3,7 @@ import { UserService } from './user.service';
 import { Status, User } from '@prisma/client';
 import { Test, TestingModule } from '@nestjs/testing';
 import { CreateUserDto } from './dto/create-user.dto';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 describe('UserService', () => {
   let userService: UserService;
@@ -85,6 +86,22 @@ describe('UserService', () => {
 
       expect(user).toStrictEqual(fakeUsers[0]);
       expect(user.status).toEqual(Status.ACTIVE);
+      expect(prismaService.user.create).toHaveBeenCalledTimes(1);
+    });
+
+    it('Should not create a duplicated user', async () => {
+      const prismaError = new PrismaClientKnownRequestError('Unique constraint failed on the constraint: `User_cpf_key`', { clientVersion: '5.14.0', code: 'P2002' });
+
+      jest.spyOn(prismaService.user, 'create').mockRejectedValueOnce(prismaError);
+
+      const userToBeCreated: CreateUserDto = {
+        email: fakeUsers[0].email,
+        password: fakeUsers[0].password,
+        username: fakeUsers[0].username,
+        name: fakeUsers[0].name,
+      };
+
+      expect(userService.create(userToBeCreated)).rejects.toThrow(PrismaClientKnownRequestError);
       expect(prismaService.user.create).toHaveBeenCalledTimes(1);
     });
   });
