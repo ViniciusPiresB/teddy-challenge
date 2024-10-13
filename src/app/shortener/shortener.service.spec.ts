@@ -232,5 +232,10 @@ describe('ShortenerService', () => {
 
       await expect(shortenerService.deleteUrl(fakeUser, fakeShortUrlsFromUser[0].shortUrl)).rejects.toThrow(UnauthorizedException);
     });
+
+    it("Shouldn't delete a URL if there's no user", async () => {
+      await expect(shortenerService.deleteUrl(null, fakeShortUrlsFromUser[0].shortUrl)).rejects.toThrow(BadRequestException);
+      expect(prismaService.shortUrls.update).not.toHaveBeenCalled();
+    });
   });
 });
