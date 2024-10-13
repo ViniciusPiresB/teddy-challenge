@@ -2,6 +2,7 @@ import { Status, User } from '@prisma/client';
 import { UserController } from './user.controller';
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserService } from './user.service';
+import { CreateUserDto } from './dto/create-user.dto';
 
 describe('UserController', () => {
   let userController: UserController;
@@ -63,5 +64,17 @@ describe('UserController', () => {
 
   it('Should be defined', () => {
     expect(userController).toBeDefined();
+  });
+
+  describe('create', () => {
+    it('Should create a user', async () => {
+      const fakeUserCreateDTO: CreateUserDto = { ...fakeUsers[0] };
+
+      const result = await userController.create(fakeUserCreateDTO);
+
+      expect(result).toEqual({ id: expect.any(String), ...fakeUserCreateDTO });
+      expect(userServiceMock.create).toHaveBeenCalledWith(fakeUserCreateDTO);
+      expect(userServiceMock.create).toHaveBeenCalledTimes(1);
+    });
   });
 });
