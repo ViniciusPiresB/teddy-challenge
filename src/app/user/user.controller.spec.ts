@@ -67,7 +67,7 @@ describe('UserController', () => {
   });
 
   describe('create', () => {
-    it('Should create a user', async () => {
+    it('Should call create user', async () => {
       const fakeUserCreateDTO: CreateUserDto = { ...fakeUsers[0] };
 
       const result = await userController.create(fakeUserCreateDTO);
@@ -75,6 +75,18 @@ describe('UserController', () => {
       expect(result).toEqual({ id: expect.any(String), ...fakeUserCreateDTO });
       expect(userServiceMock.create).toHaveBeenCalledWith(fakeUserCreateDTO);
       expect(userServiceMock.create).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('findByEmail', () => {
+    it('Should call findByEmail', async () => {
+      const { email } = fakeUsers[0];
+
+      const result = await userController.findByEmail(email);
+
+      expect(result).toEqual({ ...fakeUsers[0], email });
+      expect(userServiceMock.findByEmail).toHaveBeenCalledWith(email);
+      expect(userServiceMock.findByEmail).toHaveBeenCalledTimes(1);
     });
   });
 });
