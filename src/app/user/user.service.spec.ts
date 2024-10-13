@@ -146,5 +146,11 @@ describe('UserService', () => {
       });
       expect(deletedUser).toEqual(deletedFakeUser);
     });
+
+    it("Shouldn't remove a not found user", async () => {
+      jest.spyOn(prismaService.user, 'findUnique').mockResolvedValueOnce(null);
+
+      await expect(userService.delete(fakeUsers[0].email)).rejects.toThrow(NotFoundException);
+    });
   });
 });
