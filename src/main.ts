@@ -13,7 +13,7 @@ async function bootstrap() {
 
   app.useGlobalFilters(new PrismaClientExceptionFilter(httpAdapter));
 
-  const config = new DocumentBuilder().setTitle('Url Shortener').setDescription('Api for URL Shortener Application').setVersion('0.4.0').addBearerAuth().build();
+  const config = new DocumentBuilder().setTitle('Url Shortener').setDescription('Api for URL Shortener Application').setVersion('0.5.0').addBearerAuth().build();
 
   const document = SwaggerModule.createDocument(app, config);
 

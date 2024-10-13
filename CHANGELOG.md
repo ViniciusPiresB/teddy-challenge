@@ -25,3 +25,9 @@ All notable changes to this project will be documented in this file.
 ### Added
 
 - Added documentation with swagger and you can now test through swagger.
+
+## [0.5.0] - 2024-10-13
+
+### Added
+
+- Added unit tests on all application.
