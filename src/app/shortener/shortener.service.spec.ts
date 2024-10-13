@@ -4,7 +4,7 @@ import { ShortUrls, Status } from '@prisma/client';
 import { Test, TestingModule } from '@nestjs/testing';
 import { JwtPayload } from '../auth/dto/jwt-payload.dto';
 import * as nanoid from 'nanoid';
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, UnauthorizedException } from '@nestjs/common';
 
 jest.mock('nanoid', () => ({
   nanoid: jest.fn(),
@@ -53,7 +53,12 @@ describe('ShortenerService', () => {
   const prismaMock = {
     shortUrls: {
       create: jest.fn().mockResolvedValue(fakeShortUrlsFromUser[0]),
+      findUnique: jest.fn().mockResolvedValue(fakeShortUrlsFromUser[0]),
       findMany: jest.fn().mockResolvedValue(fakeShortUrlsFromUser),
+      update: jest.fn().mockResolvedValue({
+        ...fakeShortUrlsFromUser[0],
+        longUrl: 'http://newlong.url',
+      }),
     },
   };
 
@@ -131,6 +136,36 @@ describe('ShortenerService', () => {
 
     it('Should throw BadRequestException if user is not provided', async () => {
       await expect(shortenerService.listUrlsOfUser(null)).rejects.toThrow(new BadRequestException('User not provided.'));
+    });
+  });
+
+  describe('updateLongUrl', () => {
+    const shortUrl = fakeShortUrlsFromUser[0].shortUrl;
+
+    it('Should update the long URL successfully', async () => {
+      const newLongUrl = 'http://newlong.url';
+
+      const result = await shortenerService.updateLongUrl(fakeUser, shortUrl, newLongUrl);
+
+      expect(result).toEqual({
+        ...fakeShortUrlsFromUser[0],
+        longUrl: newLongUrl,
+      });
+      expect(prismaService.shortUrls.update).toHaveBeenCalledWith({
+        where: { shortUrl },
+        data: { longUrl: newLongUrl },
+      });
+      expect(prismaService.shortUrls.update).toHaveBeenCalledTimes(1);
+    });
+
+    it("Shouldn't throw BadRequestException if user is not provided", async () => {
+      await expect(shortenerService.updateLongUrl(null, shortUrl, 'http://newlong.url')).rejects.toThrow(new BadRequestException('User not provided.'));
+    });
+
+    it("Shouldn't get a url that is not yours", async () => {
+      const anotherUser: JwtPayload = { ...fakeUser, id: 'different-user-id' };
+
+      await expect(shortenerService.updateLongUrl(anotherUser, shortUrl, 'http://newlong.url')).rejects.toThrow(new UnauthorizedException("This URL isn't from this user!"));
     });
   });
 });
