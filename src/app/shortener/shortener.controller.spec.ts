@@ -114,4 +114,15 @@ describe('ShortenerController', () => {
       expect(shortenerServiceMock.updateLongUrl).toHaveBeenCalledTimes(1);
     });
   });
+
+  describe('deleteUrl', () => {
+    it('Should delete a short URL', async () => {
+      const result = await shortenerController.deleteUrl(fakeShortUrlsFromUser[0].shortUrl, fakeUser);
+
+      expect(result).toEqual({ ...fakeShortUrlsFromUser[0], status: Status.DELETED, deletedAt: expect.any(Date) });
+      expect(shortenerServiceMock.deleteUrl).toHaveBeenCalledWith(fakeUser, fakeShortUrlsFromUser[0].shortUrl);
+      expect(shortenerServiceMock.deleteUrl).toHaveBeenCalledTimes(1);
+    });
+  });
+
 });
