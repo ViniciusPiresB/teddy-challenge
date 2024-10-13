@@ -1,14 +1,37 @@
-import { Body, Controller, Get, Param, Post, Res } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Res } from '@nestjs/common';
 import { ShortenerService } from './shortener.service';
 import { CreateShortDto } from './dto/create-short.dto';
+import { GetUser } from '../decorator/get-user.decorator';
+import { JwtPayload } from '../auth/dto/jwt-payload.dto';
+import { Roles } from '../auth/decorator/roles.decorator';
+import { UserRole } from '../auth/roles/roles';
+import { UpdateShortDto } from './dto/update-short.dto';
 
 @Controller()
 export class ShortenerController {
   constructor(private readonly shortenerService: ShortenerService) {}
 
   @Post()
-  create(@Body() createShortDto: CreateShortDto) {
-    return this.shortenerService.createShortUrl(createShortDto.url);
+  create(@Body() createShortDto: CreateShortDto, @GetUser() user: JwtPayload) {
+    return this.shortenerService.createShortUrl(createShortDto.url, user);
+  }
+
+  @Get('/url')
+  @Roles(...UserRole)
+  async listUrlsOfUser(@GetUser() user: JwtPayload) {
+    return this.shortenerService.listUrlsOfUser(user);
+  }
+
+  @Roles(...UserRole)
+  @Patch('/url/:shortUrl')
+  async updateLongUrl(@Param('shortUrl') shortUrl: string, @GetUser() user: JwtPayload, @Body() updateShort: UpdateShortDto) {
+    return this.shortenerService.updateLongUrl(user, shortUrl, updateShort.longUrl);
+  }
+
+  @Roles(...UserRole)
+  @Delete('/url/:shortUrl')
+  async deleteUrl(@Param('shortUrl') shortUrl: string, @GetUser() user: JwtPayload) {
+    return this.shortenerService.deleteUrl(user, shortUrl);
   }
 
   @Get(':shortUrl')
