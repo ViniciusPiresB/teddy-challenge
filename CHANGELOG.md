@@ -19,3 +19,9 @@ All notable changes to this project will be documented in this file.
 ### Added
 
 - Added operation with authenticated user in shortened urls.
+
+## [0.4.0] - 2024-10-13
+
+### Added
+
+- Added documentation with swagger and you can now test through swagger.
