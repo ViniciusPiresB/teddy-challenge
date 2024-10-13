@@ -5,7 +5,7 @@ import { UserService } from '../user/user.service';
 import { Status, User } from '@prisma/client';
 import { validatePassword } from '../utils/validate-password';
 import { LoginDto } from './dto/login.dto';
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, UnauthorizedException } from '@nestjs/common';
 
 jest.mock('../utils/validate-password');
 
@@ -70,6 +70,18 @@ describe('AuthService', () => {
       await expect(authService.validate({ ...loginDto, password: '' })).rejects.toThrow(new BadRequestException('Missing password or email in request.'));
 
       await expect(authService.validate({ ...loginDto, email: '' })).rejects.toThrow(new BadRequestException('Missing password or email in request.'));
+    });
+
+    it('Should throw Error if user is not found or password invalid', async () => {
+      mockUserService.findByEmail.mockResolvedValue(null);
+      (validatePassword as jest.Mock).mockResolvedValue(false);
+
+      await expect(authService.validate(loginDto)).rejects.toThrow(new UnauthorizedException('Email or password invalid.'));
+
+      mockUserService.findByEmail.mockResolvedValue(fakeUser);
+      (validatePassword as jest.Mock).mockResolvedValue(false);
+
+      await expect(authService.validate(loginDto)).rejects.toThrow(new UnauthorizedException('Email or password invalid.'));
     });
   });
 });
