@@ -1,0 +1,45 @@
+name: Deploy to AWS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20.18.0'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build the project
+        run: npm run build
+
+      - name: Deploy to AWS
+        env:
+          EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
+          EC2_USER: 'ec2-user'
+          BASE_URL: 'http://52.73.47.139:8000'
+          EC2_HOST: 'ec2-52-73-47-139.compute-1.amazonaws.com'
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+        run: |
+          echo "${{ secrets.EC2_SSH_KEY }}" > key.pem
+          chmod 600 key.pem
+          scp -i key.pem -o StrictHostKeyChecking=no -r ./* ${EC2_USER}@${EC2_HOST}:/home/${EC2_USER}/teddychallenge/
+          ssh -i key.pem -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST} "
+            echo 'export DATABASE_URL=${DATABASE_URL}' >> ~/.bashrc &&
+            echo 'export JWT_SECRET=${JWT_SECRET}' >> ~/.bashrc &&
+            source ~/.bashrc && 
+            cd /home/${EC2_USER}/teddychallenge && 
+            npm install && 
+            pm2 restart dist/main.js"
