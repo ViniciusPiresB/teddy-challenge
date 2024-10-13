@@ -93,4 +93,13 @@ describe('ShortenerController', () => {
     });
   });
 
+  describe('listUrlsOfUser', () => {
+    it('Should return list of URLs for the user', async () => {
+      const result = await shortenerController.listUrlsOfUser(fakeUser);
+
+      expect(result).toEqual(fakeShortUrlsFromUser.filter(url => url.userId === fakeUser.id));
+      expect(shortenerServiceMock.listUrlsOfUser).toHaveBeenCalledWith(fakeUser);
+      expect(shortenerServiceMock.listUrlsOfUser).toHaveBeenCalledTimes(1);
+    });
+  });
 });
