@@ -2,6 +2,7 @@ import { PrismaService } from '../../database/prisma.service';
 import { UserService } from './user.service';
 import { Status, User } from '@prisma/client';
 import { Test, TestingModule } from '@nestjs/testing';
+import { CreateUserDto } from './dto/create-user.dto';
 
 describe('UserService', () => {
   let userService: UserService;
@@ -69,5 +70,22 @@ describe('UserService', () => {
   it('Should be defined', () => {
     expect(userService).toBeDefined();
     expect(prismaService).toBeDefined();
+  });
+
+  describe('create', () => {
+    it('Should create an user successfully', async () => {
+      const userToBeCreated: CreateUserDto = {
+        email: fakeUsers[0].email,
+        password: fakeUsers[0].password,
+        username: fakeUsers[0].username,
+        name: fakeUsers[0].name,
+      };
+
+      const user = await userService.create(userToBeCreated);
+
+      expect(user).toStrictEqual(fakeUsers[0]);
+      expect(user.status).toEqual(Status.ACTIVE);
+      expect(prismaService.user.create).toHaveBeenCalledTimes(1);
+    });
   });
 });
