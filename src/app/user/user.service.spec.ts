@@ -4,7 +4,7 @@ import { Status, User } from '@prisma/client';
 import { Test, TestingModule } from '@nestjs/testing';
 import { CreateUserDto } from './dto/create-user.dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
-import { NotFoundException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 
 describe('UserService', () => {
   let userService: UserService;
@@ -44,6 +44,12 @@ describe('UserService', () => {
     email: 'updatedemail@user.com',
     username: 'updatedtestuser1',
     updatedAt: new Date(),
+  };
+
+  const deletedFakeUser: User = {
+    ...fakeUsers[0],
+    status: Status.DELETED,
+    deletedAt: new Date(),
   };
 
   const prismaMock = {
@@ -119,6 +125,12 @@ describe('UserService', () => {
       jest.spyOn(prismaService.user, 'findUnique').mockRejectedValueOnce(new NotFoundException('User not found.'));
 
       expect(userService.findByEmail('notexist@email.com')).rejects.toThrow(NotFoundException);
+    });
+
+    it('Should throw an exception when find a deleted user', () => {
+      jest.spyOn(prismaService.user, 'findUnique').mockRejectedValueOnce(new BadRequestException('User deleted.'));
+
+      expect(userService.findByEmail(deletedFakeUser.email)).rejects.toThrow(BadRequestException);
     });
   });
 });
