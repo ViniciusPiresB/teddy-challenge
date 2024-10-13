@@ -3,6 +3,7 @@ import { UserController } from './user.controller';
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
+import { JwtPayload } from '../auth/dto/jwt-payload.dto';
 
 describe('UserController', () => {
   let userController: UserController;
@@ -33,6 +34,19 @@ describe('UserController', () => {
       deletedAt: null,
     },
   ];
+
+  const fakeJwtPayload: JwtPayload = {
+    id: Date.now().toString(),
+    email: fakeUsers[0].email,
+    username: fakeUsers[0].username,
+    name: fakeUsers[0].name,
+    status: fakeUsers[0].status,
+    typeUser: 1,
+    createdAt: Date.now().toString(),
+    updatedAt: Date.now().toString(),
+    deletedAt: null,
+    iat: Date.now(),
+  };
 
   const userServiceMock = {
     create: jest.fn(userCreateDTO => {
@@ -87,6 +101,15 @@ describe('UserController', () => {
       expect(result).toEqual({ ...fakeUsers[0], email });
       expect(userServiceMock.findByEmail).toHaveBeenCalledWith(email);
       expect(userServiceMock.findByEmail).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('delete', () => {
+    it('Should call delete', async () => {
+      const result = await userController.deleteAccount(fakeJwtPayload);
+
+      expect(result).toStrictEqual({ ...fakeUsers[0], status: Status.DELETED, deletedAt: expect.any(Date) });
+      expect(userServiceMock.delete).toHaveBeenCalled();
     });
   });
 });
