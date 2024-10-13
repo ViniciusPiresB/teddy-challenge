@@ -37,6 +37,6 @@ export class PrismaClientExceptionFilter extends BaseExceptionFilter {
 
     response
       .status(statusCode)
-      .send({ statusCode: statusCode, message: errorMessage });
+      .send({ statusCode: statusCode, message: errorMessage );
   }
 }
