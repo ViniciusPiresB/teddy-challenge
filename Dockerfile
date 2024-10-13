@@ -16,7 +16,7 @@ RUN npm install
 
 COPY . .
 
-EXPOSE 3000
+EXPOSE 8000
 
 # Comando para rodar o Prisma migration e iniciar a aplicação
 CMD ["ash", "-c", "npm run prisma:deploy && npm run build && node dist/main.js"]

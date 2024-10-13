@@ -35,7 +35,7 @@ Para rodar a aplicação com Docker, siga os passos abaixo:
     3. Configure as variáveis de ambiente no arquivo `.env` baseado no arquivo `.env.example`
     4. No arquivo Dockerfile, verifique de colocar a variável JWT_SECRET na linha 8 conforme colocaria no arquivo .env
     5. Construa a imagem do Docker: `docker-compose up --build`
-    6. Acesse a documentação da aplicação em `http://localhost:3000/doc`
+    6. Acesse a documentação da aplicação em `http://localhost:8000/doc`
 
 ## Rodando sem Docker
 
@@ -51,14 +51,13 @@ Para rodar a aplicação sem Docker, siga os passos abaixo:
         4.2 Abra o arquivo `.env` com um editor de texto e adicione as seguintes linhas:
             DATABASE_URL="postgresql://postgres:root@localhost:5432/teddychallenge?schema=public"
             JWT_SECRET="sua_senha_secreta_para_gerar_tokens"
-            BASE_URL="http://localhost:3000"
-
+            BASE_URL="http://localhost:8000"
     5. Inicie a aplicação: `npm start`
-    6. Acesse a aplicação em `http://localhost:3000`
+    6. Acesse a aplicação em `http://localhost:8000`
 
 ## Documentação Swagger
 
-Para visualizar a documentação Swagger, acesse `http://localhost:3000/doc`, a partir desta documentação, será possível utilizar a aplicação via swagger.
+Para visualizar a documentação Swagger, acesse `http://localhost:8000/doc`, a partir desta documentação, será possível utilizar a aplicação via swagger.
 
 ## Versão do Node.js e npm
 
