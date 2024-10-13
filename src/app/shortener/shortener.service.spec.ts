@@ -92,5 +92,24 @@ describe('ShortenerService', () => {
       });
       expect(prismaService.shortUrls.create).toHaveBeenCalledTimes(1);
     });
+
+    it('Should create a short URL without userId when user is not provided', async () => {
+      const longUrl = 'http://example.com';
+      (nanoid.nanoid as jest.Mock).mockReturnValueOnce(fakeShortUrlsFromUser[0].shortUrl);
+
+      const result = await shortenerService.createShortUrl(longUrl, null);
+
+      expect(result).toEqual({
+        shortenedUrl: `${process.env.BASE_URL}/${fakeShortUrlsFromUser[0].shortUrl}`,
+      });
+      expect(prismaService.shortUrls.create).toHaveBeenCalledWith({
+        data: {
+          longUrl,
+          shortUrl: fakeShortUrlsFromUser[0].shortUrl,
+          userId: undefined,
+        },
+      });
+      expect(prismaService.shortUrls.create).toHaveBeenCalledTimes(1);
+    });
   });
 });
