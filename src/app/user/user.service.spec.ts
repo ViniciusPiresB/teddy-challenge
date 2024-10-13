@@ -133,4 +133,18 @@ describe('UserService', () => {
       expect(userService.findByEmail(deletedFakeUser.email)).rejects.toThrow(BadRequestException);
     });
   });
+
+  describe('delete', () => {
+    it('Should remove a user successfully', async () => {
+      jest.spyOn(prismaService.user, 'update').mockResolvedValueOnce(deletedFakeUser);
+
+      const { email } = fakeUsers[0];
+      const deletedUser = await userService.delete(email);
+
+      expect(prismaService.user.findUnique).toHaveBeenCalledWith({
+        where: { email },
+      });
+      expect(deletedUser).toEqual(deletedFakeUser);
+    });
+  });
 });
