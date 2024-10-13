@@ -125,4 +125,18 @@ describe('ShortenerController', () => {
     });
   });
 
+  describe('redirect', () => {
+    it('Should redirect to the long URL', async () => {
+      const mockResponse = {
+        status: jest.fn().mockReturnThis(),
+        redirect: jest.fn(),
+      };
+
+      await shortenerController.redirect(fakeShortUrlsFromUser[0].shortUrl, mockResponse);
+
+      expect(shortenerServiceMock.findLongUrl).toHaveBeenCalledWith(fakeShortUrlsFromUser[0].shortUrl);
+      expect(mockResponse.status).toHaveBeenCalledWith(200);
+      expect(mockResponse.redirect).toHaveBeenCalledWith(fakeShortUrlsFromUser[0].longUrl);
+    });
+  });
 });
