@@ -32,8 +32,10 @@ Para rodar a aplicação com Docker, siga os passos abaixo:
 
     1. Tenha o Docker instalado em sua máquina.
     2. No terminal, navegue até a pasta do projeto.
-    3. Construa a imagem do Docker: `docker-compose up --build`
-    4. Acesse a documentação da aplicação em `http://localhost:3000/doc`
+    3. Configure as variáveis de ambiente no arquivo `.env` baseado no arquivo `.env.example`
+    4. No arquivo Dockerfile, verifique de colocar a variável JWT_SECRET na linha 8 conforme colocaria no arquivo .env
+    5. Construa a imagem do Docker: `docker-compose up --build`
+    6. Acesse a documentação da aplicação em `http://localhost:3000/doc`
 
 ## Rodando sem Docker
 
