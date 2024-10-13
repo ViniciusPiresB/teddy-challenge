@@ -5,6 +5,7 @@ import { UserService } from '../user/user.service';
 import { Status, User } from '@prisma/client';
 import { validatePassword } from '../utils/validate-password';
 import { LoginDto } from './dto/login.dto';
+import { BadRequestException } from '@nestjs/common';
 
 jest.mock('../utils/validate-password');
 
@@ -63,6 +64,12 @@ describe('AuthService', () => {
       const result = await authService.validate(loginDto);
 
       expect(result).toEqual({ accessToken: 'fake token' });
+    });
+
+    it('Should throw Error if password or email is missing', async () => {
+      await expect(authService.validate({ ...loginDto, password: '' })).rejects.toThrow(new BadRequestException('Missing password or email in request.'));
+
+      await expect(authService.validate({ ...loginDto, email: '' })).rejects.toThrow(new BadRequestException('Missing password or email in request.'));
     });
   });
 });
