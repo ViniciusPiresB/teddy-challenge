@@ -4,6 +4,7 @@ import { ShortUrls, Status } from '@prisma/client';
 import { Test, TestingModule } from '@nestjs/testing';
 import { JwtPayload } from '../auth/dto/jwt-payload.dto';
 import * as nanoid from 'nanoid';
+import { BadRequestException } from '@nestjs/common';
 
 jest.mock('nanoid', () => ({
   nanoid: jest.fn(),
@@ -52,6 +53,7 @@ describe('ShortenerService', () => {
   const prismaMock = {
     shortUrls: {
       create: jest.fn().mockResolvedValue(fakeShortUrlsFromUser[0]),
+      findMany: jest.fn().mockResolvedValue(fakeShortUrlsFromUser),
     },
   };
 
@@ -110,6 +112,25 @@ describe('ShortenerService', () => {
         },
       });
       expect(prismaService.shortUrls.create).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('listUrlsOfUser', () => {
+    it('Should return the list of URLs for a given user', async () => {
+      const result = await shortenerService.listUrlsOfUser(fakeUser);
+
+      expect(result).toEqual(fakeShortUrlsFromUser);
+      expect(prismaService.shortUrls.findMany).toHaveBeenCalledWith({
+        where: {
+          userId: fakeUser.id,
+          status: Status.ACTIVE,
+        },
+      });
+      expect(prismaService.shortUrls.findMany).toHaveBeenCalledTimes(1);
+    });
+
+    it('Should throw BadRequestException if user is not provided', async () => {
+      await expect(shortenerService.listUrlsOfUser(null)).rejects.toThrow(new BadRequestException('User not provided.'));
     });
   });
 });
