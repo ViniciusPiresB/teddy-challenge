@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { nanoid } from 'nanoid';
-import { PrismaService } from 'src/database/prisma.service';
+import { PrismaService } from '../../database/prisma.service';
 import { JwtPayload } from '../auth/dto/jwt-payload.dto';
 import { Status } from '@prisma/client';
 
@@ -57,7 +57,7 @@ export class ShortenerService {
   async findLongUrl(shortUrl: string) {
     const url = await this.getUrl(shortUrl);
 
-    await this.prismaService.shortUrls.update({
+    const urlFound = await this.prismaService.shortUrls.update({
       where: url,
       data: {
         click: {
@@ -66,7 +66,7 @@ export class ShortenerService {
       },
     });
 
-    return url;
+    return urlFound;
   }
 
   async deleteUrl(user: JwtPayload, shortUrl: string) {
