@@ -42,9 +42,10 @@ jobs:
           chmod 600 key.pem
           scp -i key.pem -o StrictHostKeyChecking=no -r ./* ${EC2_USER}@${EC2_HOST}:/home/${EC2_USER}/teddychallenge/
           ssh -i key.pem -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST} "
+            set -e;
             echo 'export DATABASE_URL=${DATABASE_URL}' >> ~/.bashrc &&
             echo 'export JWT_SECRET=${JWT_SECRET}' >> ~/.bashrc &&
             source ~/.bashrc && 
             cd /home/${EC2_USER}/teddychallenge && 
             npm install && 
-            pm2 restart dist/main.js"
+            pm2 start dist/main.js --name 'teddy-app' || pm2 restart 'teddy-app'"
