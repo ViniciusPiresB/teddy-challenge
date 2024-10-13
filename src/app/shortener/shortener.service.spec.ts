@@ -192,4 +192,34 @@ describe('ShortenerService', () => {
       expect(prismaService.shortUrls.update).toHaveBeenCalledTimes(1);
     });
   });
+
+  describe('delete', () => {
+    it('Should delete the URL for logged user', async () => {
+      const { shortUrl } = fakeShortUrlsFromUser[0];
+      const deletedAt = new Date().toISOString();
+
+      prismaService.shortUrls.update = jest.fn().mockResolvedValueOnce({
+        ...fakeShortUrlsFromUser[0],
+        deletedAt,
+        status: Status.DELETED,
+      });
+
+      const result = await shortenerService.deleteUrl(fakeUser, shortUrl);
+
+      expect(result).toEqual({
+        ...fakeShortUrlsFromUser[0],
+        deletedAt,
+        status: Status.DELETED,
+      });
+      expect(prismaService.shortUrls.update).toHaveBeenCalledWith({
+        where: fakeShortUrlsFromUser[0],
+        data: {
+          deletedAt,
+          status: Status.DELETED,
+        },
+      });
+
+      expect(prismaService.shortUrls.update).toHaveBeenCalledTimes(1);
+    });
+  });
 });
