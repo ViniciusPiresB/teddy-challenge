@@ -4,6 +4,7 @@ import { Status, User } from '@prisma/client';
 import { Test, TestingModule } from '@nestjs/testing';
 import { CreateUserDto } from './dto/create-user.dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { NotFoundException } from '@nestjs/common';
 
 describe('UserService', () => {
   let userService: UserService;
@@ -112,6 +113,12 @@ describe('UserService', () => {
 
       expect(user).toStrictEqual(fakeUsers[0]);
       expect(prismaService.user.findUnique).toHaveBeenCalledTimes(1);
+    });
+
+    it('Should throw an exception when find a non existent user', () => {
+      jest.spyOn(prismaService.user, 'findUnique').mockRejectedValueOnce(new NotFoundException('User not found.'));
+
+      expect(userService.findByEmail('notexist@email.com')).rejects.toThrow(NotFoundException);
     });
   });
 });
