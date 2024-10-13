@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { nanoid } from 'nanoid';
-import { PrismaService } from 'src/database/prisma.service';
+import { PrismaService } from '../../database/prisma.service';
 import { JwtPayload } from '../auth/dto/jwt-payload.dto';
 import { Status } from '@prisma/client';
 
