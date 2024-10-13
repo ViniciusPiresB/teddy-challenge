@@ -102,4 +102,16 @@ describe('ShortenerController', () => {
       expect(shortenerServiceMock.listUrlsOfUser).toHaveBeenCalledTimes(1);
     });
   });
+
+  describe('updateLongUrl', () => {
+    it('Should update the long URL for a given short URL', async () => {
+      const updateShortDto: UpdateShortDto = { longUrl: 'http://updated.com' };
+
+      const result = await shortenerController.updateLongUrl(fakeShortUrlsFromUser[0].shortUrl, fakeUser, updateShortDto);
+
+      expect(result).toEqual({ ...fakeShortUrlsFromUser[0], longUrl: updateShortDto.longUrl });
+      expect(shortenerServiceMock.updateLongUrl).toHaveBeenCalledWith(fakeUser, fakeShortUrlsFromUser[0].shortUrl, updateShortDto.longUrl);
+      expect(shortenerServiceMock.updateLongUrl).toHaveBeenCalledTimes(1);
+    });
+  });
 });
