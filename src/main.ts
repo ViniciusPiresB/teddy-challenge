@@ -18,7 +18,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
 
   SwaggerModule.setup('doc', app, document);
-
+  console.log('Testing github actions (SHOULD FAIL)');
   await app.listen(3000);
 }
 bootstrap();
