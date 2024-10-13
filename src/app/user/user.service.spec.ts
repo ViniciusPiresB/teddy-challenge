@@ -152,5 +152,11 @@ describe('UserService', () => {
 
       await expect(userService.delete(fakeUsers[0].email)).rejects.toThrow(NotFoundException);
     });
+
+    it("Shouldn't delete a deleted user", async () => {
+      jest.spyOn(prismaService.user, 'findUnique').mockResolvedValueOnce(deletedFakeUser);
+
+      await expect(userService.delete(deletedFakeUser.email)).rejects.toThrow(BadRequestException);
+    });
   });
 });
