@@ -221,5 +221,16 @@ describe('ShortenerService', () => {
 
       expect(prismaService.shortUrls.update).toHaveBeenCalledTimes(1);
     });
+
+    it("Shouldn't delete a URL from another user", async () => {
+      const fakeShortUrlFromAnotherUser = {
+        ...fakeShortUrlsFromUser[0],
+        userId: new Date().toISOString(),
+      };
+
+      jest.spyOn(prismaService.shortUrls, 'findUnique').mockResolvedValueOnce(fakeShortUrlFromAnotherUser);
+
+      await expect(shortenerService.deleteUrl(fakeUser, fakeShortUrlsFromUser[0].shortUrl)).rejects.toThrow(UnauthorizedException);
+    });
   });
 });
