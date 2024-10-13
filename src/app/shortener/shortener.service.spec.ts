@@ -168,4 +168,28 @@ describe('ShortenerService', () => {
       await expect(shortenerService.updateLongUrl(anotherUser, shortUrl, 'http://newlong.url')).rejects.toThrow(new UnauthorizedException("This URL isn't from this user!"));
     });
   });
+
+  describe('findLongUrl', () => {
+    it('Should retrieve the long URL and increment the click count', async () => {
+      const shortUrl = fakeShortUrlsFromUser[0].shortUrl;
+
+      prismaService.shortUrls.update = jest.fn().mockResolvedValueOnce({
+        ...fakeShortUrlsFromUser[0],
+        click: fakeShortUrlsFromUser[0].click + 1,
+      });
+
+      const result = await shortenerService.findLongUrl(shortUrl);
+
+      expect(result).toStrictEqual({ ...fakeShortUrlsFromUser[0], click: fakeShortUrlsFromUser[0].click + 1 });
+      expect(prismaService.shortUrls.update).toHaveBeenCalledWith({
+        where: fakeShortUrlsFromUser[0],
+        data: {
+          click: {
+            increment: 1,
+          },
+        },
+      });
+      expect(prismaService.shortUrls.update).toHaveBeenCalledTimes(1);
+    });
+  });
 });
