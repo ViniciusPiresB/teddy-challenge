@@ -105,4 +105,13 @@ describe('UserService', () => {
       expect(prismaService.user.create).toHaveBeenCalledTimes(1);
     });
   });
+
+  describe('findByEmail', () => {
+    it('Should find a specific user by his email', async () => {
+      const user = await userService.findByEmail(fakeUsers[0].email);
+
+      expect(user).toStrictEqual(fakeUsers[0]);
+      expect(prismaService.user.findUnique).toHaveBeenCalledTimes(1);
+    });
+  });
 });
