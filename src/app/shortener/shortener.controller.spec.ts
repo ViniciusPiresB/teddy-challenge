@@ -1,0 +1,83 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { ShortUrls, Status } from '@prisma/client';
+import { ShortenerController } from './shortener.controller';
+import { JwtPayload } from '../auth/dto/jwt-payload.dto';
+import { Test, TestingModule } from '@nestjs/testing';
+import { ShortenerService } from './shortener.service';
+import { CreateShortDto } from './dto/create-short.dto';
+import { UpdateShortDto } from './dto/update-short.dto';
+
+describe('ShortenerController', () => {
+  let shortenerController: ShortenerController;
+
+  const fakeUser: JwtPayload = {
+    name: 'Test User 1',
+    id: 'a3718843-5456-4482-9c97-a20f78cbd44e',
+    email: 'test@user.com',
+    username: 'testuser1',
+    typeUser: 1,
+    status: Status.ACTIVE,
+    createdAt: new Date().toString(),
+    updatedAt: new Date().toString(),
+    deletedAt: null,
+    iat: Date.now(),
+  };
+
+  const fakeShortUrlsFromUser: ShortUrls[] = [
+    {
+      id: new Date().toISOString(),
+      longUrl: 'http://long.url',
+      shortUrl: '123abc',
+      click: 0,
+      status: Status.ACTIVE,
+      userId: fakeUser.id,
+      updatedAt: new Date(),
+      deletedAt: null,
+    },
+    {
+      id: new Date().toISOString(),
+      longUrl: 'http://long.url',
+      shortUrl: '456def',
+      click: 0,
+      status: Status.ACTIVE,
+      userId: fakeUser.id,
+      updatedAt: new Date(),
+      deletedAt: null,
+    },
+  ];
+
+  const shortenerServiceMock = {
+    createShortUrl: jest.fn((longUrl: string, user: JwtPayload) => {
+      return { ...fakeShortUrlsFromUser[0], longUrl };
+    }),
+    listUrlsOfUser: jest.fn(user => {
+      return fakeShortUrlsFromUser.filter(url => url.userId === user.id);
+    }),
+    updateLongUrl: jest.fn((user, shortUrl, newLongUrl) => {
+      return { ...fakeShortUrlsFromUser[0], longUrl: newLongUrl };
+    }),
+    deleteUrl: jest.fn(() => {
+      return { ...fakeShortUrlsFromUser[0], status: Status.DELETED, deletedAt: new Date() };
+    }),
+    findLongUrl: jest.fn(shortUrl => {
+      return fakeShortUrlsFromUser.find(url => url.shortUrl === shortUrl);
+    }),
+  };
+
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      controllers: [ShortenerController],
+      providers: [{ provide: ShortenerService, useValue: shortenerServiceMock }],
+    }).compile();
+
+    shortenerController = module.get<ShortenerController>(ShortenerController);
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('Should be defined', () => {
+    expect(shortenerController).toBeDefined();
+  });
+});
