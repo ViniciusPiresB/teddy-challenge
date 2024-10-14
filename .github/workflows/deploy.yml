@@ -25,6 +25,7 @@ jobs:
         run: |
           echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env
           echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
+          echo "BASE_URL=http://52.73.47.139:8000" >> .env
 
       - name: Build the project
         run: npm run build
