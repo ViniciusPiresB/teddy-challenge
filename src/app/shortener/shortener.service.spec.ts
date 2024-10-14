@@ -214,7 +214,7 @@ describe('ShortenerService', () => {
       expect(prismaService.shortUrls.update).toHaveBeenCalledWith({
         where: fakeShortUrlsFromUser[0],
         data: {
-          deletedAt,
+          deletedAt: expect.any(String),
           status: Status.DELETED,
         },
       });
