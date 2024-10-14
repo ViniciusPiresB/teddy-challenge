@@ -43,7 +43,7 @@ jobs:
           echo "Key copied"
           chmod 600 key.pem
           echo "Key permission changed"
-          rsync -avz -e "ssh -i key.pem -o StrictHostKeyChecking=no" . ${EC2_USER}@${EC2_HOST}:/home/${EC2_USER}/teddychallenge/
+          rsync -avz -e "ssh -i key.pem -o StrictHostKeyChecking=no" --info=none . ${EC2_USER}@${EC2_HOST}:/home/${EC2_USER}/teddychallenge/
           echo "scp"
           ssh -i key.pem -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST} "
             set -e;
