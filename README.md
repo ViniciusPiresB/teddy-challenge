@@ -28,11 +28,6 @@ npm  test
 
 ```
 
-## Deploy criado da aplicação na AWS
-
-Um deploy automatizado foi feito deste projeto no provedor AWS, o link exposto pode ser acessado em:
-<http://52.73.47.139:8000/doc>
-  
 ## Aplicação
 
 ## Rodando com Docker
