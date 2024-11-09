@@ -16,10 +16,6 @@ export class UserService {
     return user;
   }
 
-  findAll() {
-    return `This action returns all user`;
-  }
-
   async findByEmail(email: string) {
     const user = await this.prismaService.user.findUnique({ where: { email } });
 
@@ -30,11 +26,19 @@ export class UserService {
     return user;
   }
 
-  update(id: number) {
-    return `This action updates a #${id} user`;
-  }
+  async delete(email: string) {
+    const user = await this.findByEmail(email);
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+    const date = new Date().toISOString();
+
+    const deletedUser = await this.prismaService.user.update({
+      where: user,
+      data: {
+        status: Status.DELETED,
+        deletedAt: date,
+      },
+    });
+
+    return deletedUser;
   }
 }
