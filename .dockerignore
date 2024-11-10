@@ -1,0 +1,16 @@
+node_modules
+dist
+coverage
+*.log
+.vscode
+.idea
+tmp
+temp
+*.tmp
+*.temp
+.cache
+*.cache
+build/
+out/
+Dockerfile
+.dockerignore
