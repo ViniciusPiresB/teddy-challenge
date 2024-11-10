@@ -1,12 +1,17 @@
-import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { nanoid } from 'nanoid';
 import { PrismaService } from '../../database/prisma.service';
 import { JwtPayload } from '../auth/dto/jwt-payload.dto';
 import { Status } from '@prisma/client';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export class ShortenerService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+  ) {}
 
   async createShortUrl(longUrl: string, user: JwtPayload) {
     const shortUrl = nanoid(6);
@@ -51,22 +56,24 @@ export class ShortenerService {
       data: { longUrl },
     });
 
+    await this.cacheManager.set(shortUrl, longUrl);
+
     return updatedUrl;
   }
 
   async findLongUrl(shortUrl: string) {
+    const cachedUrl = await this.cacheManager.get(shortUrl);
+
+    if (cachedUrl) {
+      await this.incrementClickCount(shortUrl);
+      return cachedUrl;
+    }
+
     const url = await this.getUrl(shortUrl);
 
-    const urlFound = await this.prismaService.shortUrls.update({
-      where: url,
-      data: {
-        click: {
-          increment: 1,
-        },
-      },
-    });
+    await this.incrementClickCount(shortUrl);
 
-    return urlFound;
+    return url.longUrl;
   }
 
   async deleteUrl(user: JwtPayload, shortUrl: string) {
@@ -88,7 +95,20 @@ export class ShortenerService {
       },
     });
 
+    await this.cacheManager.del(shortUrl);
+
     return deletedUrl;
+  }
+
+  private incrementClickCount(shortUrl: string) {
+    return this.prismaService.shortUrls.update({
+      where: { shortUrl },
+      data: {
+        click: {
+          increment: 1,
+        },
+      },
+    });
   }
 
   private async getUrl(shortUrl: string) {
@@ -97,6 +117,8 @@ export class ShortenerService {
     });
 
     if (!url) throw new NotFoundException('ShortUrl Not Found.');
+
+    await this.cacheManager.set(shortUrl, url.longUrl);
 
     return url;
   }

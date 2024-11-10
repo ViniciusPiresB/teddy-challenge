@@ -136,7 +136,7 @@ describe('ShortenerController', () => {
 
       expect(shortenerServiceMock.findLongUrl).toHaveBeenCalledWith(fakeShortUrlsFromUser[0].shortUrl);
       expect(mockResponse.status).toHaveBeenCalledWith(200);
-      expect(mockResponse.redirect).toHaveBeenCalledWith(fakeShortUrlsFromUser[0].longUrl);
+      expect(mockResponse.redirect).toHaveBeenCalledWith(fakeShortUrlsFromUser[0]);
     });
   });
 });

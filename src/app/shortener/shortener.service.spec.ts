@@ -5,6 +5,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { JwtPayload } from '../auth/dto/jwt-payload.dto';
 import * as nanoid from 'nanoid';
 import { BadRequestException, UnauthorizedException } from '@nestjs/common';
+import { CacheModule } from '@nestjs/cache-manager';
+import { ShortenerModule } from './shortener.module';
 
 jest.mock('nanoid', () => ({
   nanoid: jest.fn(),
@@ -64,8 +66,11 @@ describe('ShortenerService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [ShortenerService, { provide: PrismaService, useValue: prismaMock }],
-    }).compile();
+      imports: [CacheModule.register({ ttl: 300000, max: 100 }), ShortenerModule],
+    })
+      .overrideProvider(PrismaService)
+      .useValue(prismaMock)
+      .compile();
 
     shortenerService = module.get<ShortenerService>(ShortenerService);
     prismaService = module.get<PrismaService>(PrismaService);
@@ -180,9 +185,9 @@ describe('ShortenerService', () => {
 
       const result = await shortenerService.findLongUrl(shortUrl);
 
-      expect(result).toStrictEqual({ ...fakeShortUrlsFromUser[0], click: fakeShortUrlsFromUser[0].click + 1 });
+      expect(result).toStrictEqual(fakeShortUrlsFromUser[0].longUrl);
       expect(prismaService.shortUrls.update).toHaveBeenCalledWith({
-        where: fakeShortUrlsFromUser[0],
+        where: { shortUrl: fakeShortUrlsFromUser[0].shortUrl },
         data: {
           click: {
             increment: 1,
