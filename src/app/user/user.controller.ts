@@ -2,6 +2,10 @@ import { Controller, Get, Post, Body, Param, Delete } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { ApiOperation, ApiOkResponse, ApiNotFoundResponse, ApiBearerAuth, ApiCreatedResponse, ApiConflictResponse, ApiForbiddenResponse } from '@nestjs/swagger';
+import { Roles } from '../auth/decorator/roles.decorator';
+import { AdminRole, UserRole } from '../auth/roles/roles';
+import { GetUser } from '../decorator/get-user.decorator';
+import { JwtPayload } from '../auth/dto/jwt-payload.dto';
 
 @Controller('user')
 export class UserController {
@@ -25,6 +29,7 @@ export class UserController {
     description: 'Missing token or not enough permission.',
   })
   @ApiBearerAuth()
+  @Roles(...AdminRole)
   @Get(':email')
   findByEmail(@Param('email') email: string) {
     return this.userService.findByEmail(email);
@@ -37,8 +42,9 @@ export class UserController {
     description: 'Missing token or not enough permission.',
   })
   @ApiBearerAuth()
+  @Roles(...UserRole)
   @Delete()
-  deleteAccount() {
-    return this.userService.delete('');
+  deleteAccount(@GetUser() activeUser: JwtPayload) {
+    return this.userService.delete(activeUser.email);
   }
 }
