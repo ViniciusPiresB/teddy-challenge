@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { nanoid } from 'nanoid';
 import { PrismaService } from 'src/database/prisma.service';
 import { JwtPayload } from '../auth/dto/jwt-payload.dto';
@@ -35,6 +35,23 @@ export class ShortenerService {
     });
 
     return urls;
+  }
+
+  async updateLongUrl(user: JwtPayload, shortUrl: string, longUrl: string) {
+    if (!user) throw new BadRequestException('User not provided.');
+
+    const url = await this.getUrl(shortUrl);
+
+    const urlUserId = url.userId;
+
+    if (!urlUserId || urlUserId != user.id) throw new UnauthorizedException("This URL isn't from this user!");
+
+    const updatedUrl = await this.prismaService.shortUrls.update({
+      where: { shortUrl },
+      data: { longUrl },
+    });
+
+    return updatedUrl;
   }
 
   async findLongUrl(shortUrl: string) {
