@@ -1,15 +1,63 @@
-import { Body, Controller, Get, Param, Post, Res } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Patch, Param, Post, Res } from '@nestjs/common';
 import { ShortenerService } from './shortener.service';
 import { CreateShortDto } from './dto/create-short.dto';
-import { ApiNotFoundResponse, ApiOperation } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiOkResponse, ApiForbiddenResponse, ApiBearerAuth, ApiCreatedResponse, ApiNotFoundResponse, ApiOperation } from '@nestjs/swagger';
+import { GetUser } from '../decorator/get-user.decorator';
+import { JwtPayload } from '../auth/dto/jwt-payload.dto';
+import { Roles } from '../auth/decorator/roles.decorator';
+import { UserRole } from '../auth/roles/roles';
+import { UpdateShortDto } from './dto/update-short.dto';
 
 @Controller('shortener')
 export class ShortenerController {
   constructor(private readonly shortenerService: ShortenerService) {}
 
+  @ApiOperation({ summary: 'Creates an url shortened.' })
+  @ApiCreatedResponse({ description: 'URL created successfully.' })
+  @ApiBadRequestResponse({ description: 'Url Empty.' })
+  @ApiBadRequestResponse({ description: 'Url must be a string.' })
+  @ApiBearerAuth()
   @Post()
-  create(@Body() createShortDto: CreateShortDto) {
-    return this.shortenerService.createShortUrl(createShortDto.url);
+  create(@Body() createShortDto: CreateShortDto, @GetUser() user: JwtPayload) {
+    return this.shortenerService.createShortUrl(createShortDto.url, user);
+  }
+
+  @ApiOperation({ summary: 'List all urls created by your user.' })
+  @ApiOkResponse({ description: 'List of all urls.' })
+  @ApiForbiddenResponse({
+    description: 'Missing token or not enough permission.',
+  })
+  @ApiBearerAuth()
+  @Get('/url')
+  @Roles(...UserRole)
+  async listUrlsOfUser(@GetUser() user: JwtPayload) {
+    return this.shortenerService.listUrlsOfUser(user);
+  }
+
+  @ApiOperation({ summary: 'Update the destination of a short URL.' })
+  @ApiOkResponse({ description: 'Destination updated.' })
+  @ApiNotFoundResponse({ description: 'Short URL not found' })
+  @ApiForbiddenResponse({
+    description: 'Missing token or not enough permission.',
+  })
+  @ApiBearerAuth()
+  @Roles(...UserRole)
+  @Patch('/url/:shortUrl')
+  async updateLongUrl(@Param('shortUrl') shortUrl: string, @GetUser() user: JwtPayload, @Body() updateShort: UpdateShortDto) {
+    return this.shortenerService.updateLongUrl(user, shortUrl, updateShort.longUrl);
+  }
+
+  @ApiOperation({ summary: 'Delete short URL from your user.' })
+  @ApiOkResponse({ description: 'Short URL deleted.' })
+  @ApiNotFoundResponse({ description: 'Short URL not found.' })
+  @ApiForbiddenResponse({
+    description: 'Missing token or not enough permission.',
+  })
+  @ApiBearerAuth()
+  @Roles(...UserRole)
+  @Delete('/url/:shortUrl')
+  async deleteUrl(@Param('shortUrl') shortUrl: string, @GetUser() user: JwtPayload) {
+    return this.shortenerService.deleteUrl(user, shortUrl);
   }
 
   @ApiOperation({ summary: 'Redirect the short url to url registered.' })
