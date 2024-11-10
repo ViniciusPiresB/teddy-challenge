@@ -1,14 +1,15 @@
 import { Body, Controller, Delete, Get, Patch, Param, Post, Res } from '@nestjs/common';
 import { ShortenerService } from './shortener.service';
 import { CreateShortDto } from './dto/create-short.dto';
-import { ApiBadRequestResponse, ApiOkResponse, ApiForbiddenResponse, ApiBearerAuth, ApiCreatedResponse, ApiNotFoundResponse, ApiOperation } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiOkResponse, ApiForbiddenResponse, ApiBearerAuth, ApiCreatedResponse, ApiNotFoundResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { GetUser } from '../decorator/get-user.decorator';
 import { JwtPayload } from '../auth/dto/jwt-payload.dto';
 import { Roles } from '../auth/decorator/roles.decorator';
 import { UserRole } from '../auth/roles/roles';
 import { UpdateShortDto } from './dto/update-short.dto';
 
-@Controller('shortener')
+@ApiTags('Shortener')
+@Controller('')
 export class ShortenerController {
   constructor(private readonly shortenerService: ShortenerService) {}
 
