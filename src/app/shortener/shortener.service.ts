@@ -69,6 +69,28 @@ export class ShortenerService {
     return urlFound;
   }
 
+  async deleteUrl(user: JwtPayload, shortUrl: string) {
+    if (!user) throw new BadRequestException('User not provided.');
+
+    const url = await this.getUrl(shortUrl);
+
+    const urlUserId = url.userId;
+
+    if (!urlUserId || urlUserId != user.id) throw new UnauthorizedException("This URL isn't from this user!");
+
+    const now = new Date().toISOString();
+
+    const deletedUrl = await this.prismaService.shortUrls.update({
+      where: url,
+      data: {
+        deletedAt: now,
+        status: Status.DELETED,
+      },
+    });
+
+    return deletedUrl;
+  }
+
   private async getUrl(shortUrl: string) {
     const url = await this.prismaService.shortUrls.findUnique({
       where: { shortUrl },

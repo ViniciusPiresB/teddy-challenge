@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Patch, Param, Post, Res } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Patch, Param, Post, Res } from '@nestjs/common';
 import { ShortenerService } from './shortener.service';
 import { CreateShortDto } from './dto/create-short.dto';
 import { ApiBadRequestResponse, ApiOkResponse, ApiForbiddenResponse, ApiBearerAuth, ApiCreatedResponse, ApiNotFoundResponse, ApiOperation } from '@nestjs/swagger';
@@ -45,6 +45,19 @@ export class ShortenerController {
   @Patch('/url/:shortUrl')
   async updateLongUrl(@Param('shortUrl') shortUrl: string, @GetUser() user: JwtPayload, @Body() updateShort: UpdateShortDto) {
     return this.shortenerService.updateLongUrl(user, shortUrl, updateShort.longUrl);
+  }
+
+  @ApiOperation({ summary: 'Delete short URL from your user.' })
+  @ApiOkResponse({ description: 'Short URL deleted.' })
+  @ApiNotFoundResponse({ description: 'Short URL not found.' })
+  @ApiForbiddenResponse({
+    description: 'Missing token or not enough permission.',
+  })
+  @ApiBearerAuth()
+  @Roles(...UserRole)
+  @Delete('/url/:shortUrl')
+  async deleteUrl(@Param('shortUrl') shortUrl: string, @GetUser() user: JwtPayload) {
+    return this.shortenerService.deleteUrl(user, shortUrl);
   }
 
   @ApiOperation({ summary: 'Redirect the short url to url registered.' })
