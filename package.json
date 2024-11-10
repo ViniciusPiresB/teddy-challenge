@@ -1,6 +1,6 @@
 {
   "name": "teddy-challenge",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "URL Shortener for Teddy test",
   "author": "Vinicius Pires Barreto",
   "private": true,

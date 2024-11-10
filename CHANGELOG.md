@@ -19,3 +19,9 @@ All notable changes to this project will be documented in this file.
 ### Added
 
 - Added operation with authenticated user in shortened urls.
+
+## [0.4.0] - 2024-11-10
+
+### Added
+
+- Added cache when search for short Urls.
