@@ -67,6 +67,6 @@ export class ShortenerController {
   async redirect(@Param('shortUrl') shortUrl: string, @Res() res) {
     const record = await this.shortenerService.findLongUrl(shortUrl);
 
-    return res.status(200).redirect(record.longUrl);
+    return res.status(200).redirect(record);
   }
 }
