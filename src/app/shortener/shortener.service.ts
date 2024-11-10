@@ -1,7 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { nanoid } from 'nanoid';
 import { PrismaService } from 'src/database/prisma.service';
 import { JwtPayload } from '../auth/dto/jwt-payload.dto';
+import { Status } from '@prisma/client';
 
 @Injectable()
 export class ShortenerService {
@@ -21,6 +22,19 @@ export class ShortenerService {
     const shortenedUrl = `${process.env.BASE_URL}/${createdShortUrl.shortUrl}`;
 
     return { shortenedUrl };
+  }
+
+  async listUrlsOfUser(user: JwtPayload) {
+    if (!user) throw new BadRequestException('User not provided.');
+
+    const urls = await this.prismaService.shortUrls.findMany({
+      where: {
+        userId: user.id,
+        status: Status.ACTIVE,
+      },
+    });
+
+    return urls;
   }
 
   async findLongUrl(shortUrl: string) {

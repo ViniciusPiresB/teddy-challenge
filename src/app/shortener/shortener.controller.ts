@@ -1,9 +1,11 @@
 import { Body, Controller, Get, Param, Post, Res } from '@nestjs/common';
 import { ShortenerService } from './shortener.service';
 import { CreateShortDto } from './dto/create-short.dto';
-import { ApiBadRequestResponse, ApiBearerAuth, ApiCreatedResponse, ApiNotFoundResponse, ApiOperation } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiOkResponse, ApiForbiddenResponse, ApiBearerAuth, ApiCreatedResponse, ApiNotFoundResponse, ApiOperation } from '@nestjs/swagger';
 import { GetUser } from '../decorator/get-user.decorator';
 import { JwtPayload } from '../auth/dto/jwt-payload.dto';
+import { Roles } from '../auth/decorator/roles.decorator';
+import { UserRole } from '../auth/roles/roles';
 
 @Controller('shortener')
 export class ShortenerController {
@@ -17,6 +19,18 @@ export class ShortenerController {
   @Post()
   create(@Body() createShortDto: CreateShortDto, @GetUser() user: JwtPayload) {
     return this.shortenerService.createShortUrl(createShortDto.url, user);
+  }
+
+  @ApiOperation({ summary: 'List all urls created by your user.' })
+  @ApiOkResponse({ description: 'List of all urls.' })
+  @ApiForbiddenResponse({
+    description: 'Missing token or not enough permission.',
+  })
+  @ApiBearerAuth()
+  @Get('/url')
+  @Roles(...UserRole)
+  async listUrlsOfUser(@GetUser() user: JwtPayload) {
+    return this.shortenerService.listUrlsOfUser(user);
   }
 
   @ApiOperation({ summary: 'Redirect the short url to url registered.' })
