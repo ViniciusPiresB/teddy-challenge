@@ -79,6 +79,12 @@ BASE_URL="<http://localhost:8000>"
 
 Para visualizar a documentação Swagger, acesse `http://localhost:8000/doc`, a partir desta documentação, será possível utilizar a aplicação via swagger.
 
+## Deploy criado da aplicação na AWS
+
+Um deploy automatizado foi feito deste projeto no provedor AWS, o link exposto pode ser acessado em:
+<http://52.73.47.139:8000/doc>
+  
+
 ## Como Utilizar a aplicação
 
 Para utilizar a aplicação, pode-se utilizar a rota `user` para criar o seu usuário, após isso, é possível fazer login na rota `auth` e obter o token de acesso para manipular links em seu usuário na rota padrão do projeto, conforme pode ser visível no swagger.
